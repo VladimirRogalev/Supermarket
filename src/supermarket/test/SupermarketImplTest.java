@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ class SupermarketImplTest {
 	Supermarket supermarket;
 	Product[] products = new Product[7];
 	LocalDate date = LocalDate.now();
+	Comparator<Product> comparator = (o1, o2) -> o1.getBrand().compareTo(o2.getBrand());
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -65,12 +67,12 @@ class SupermarketImplTest {
 
 	@Test
 	void testFindByBrand() {
-		Product[] expected = { products[1], products[2] };
+		Product[] expected = { products[2], products[1] };
+//		Arrays.sort(expected,comparator);
 		Product[] actual = supermarket.findByBrand("Coca-Cola");
+//		Arrays.sort(actual,comparator);
 		assertArrayEquals(expected, actual);
 	}
-
-
 
 	@Test
 	void testFindProductsWithExpiredDate() {

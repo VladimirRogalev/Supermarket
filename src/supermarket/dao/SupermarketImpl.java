@@ -13,13 +13,16 @@ public class SupermarketImpl implements Supermarket {
 	Product[] products;
 	int skuQuantity;
 	private Comparator<Product> comparator = (o1, o2) -> {
-		return Long.compare(o1.getBarCode(), o2.getBarCode());
-//		int res = o1.getCategory().compareTo(o2.getCategory());
-//		 res = o1.getExpDate().compareTo(o2.getExpDate());
-//		res = res == 0 ? o1.getBrand().compareTo(o2.getBrand()) : res;
-//		return o1.getExpDate().compareTo(o2.getExpDate());
-//		return (int) (res == 0 ? o1.getBarCode() - o2.getBarCode() : res);
+		int res = o1.getCategory().compareTo(o2.getCategory());
+		res = res == 0 ? Long.compare(o1.getBarCode(), o2.getBarCode()) : res;
+		return (res == 0 ? o1.getBrand().compareTo(o2.getBrand()) : res);
 	};
+//	private Comparator<Product> comparatorByExpiryDate = (o1, o2) -> {
+//		int res = o1.getExpDate().compareTo(o2.getExpDate());
+//		return res == 0 ? Long.compare(o1.getBarCode(), o2.getBarCode()) : res;
+//		
+//	};
+	
 
 	public SupermarketImpl() {
 		products = new Product[INITIAL_CAPACITY];
@@ -31,10 +34,10 @@ public class SupermarketImpl implements Supermarket {
 		if (product == null || findByBarCode(product.getBarCode()) != null || skuQuantity == products.length) {
 			return false;
 		}
-//		int index = -Arrays.binarySearch(products, 0, skuQuantity, product, comparator) - 1;
-//		System.arraycopy(products, index, products, index + 1, skuQuantity++ - index);
-//		products[index] = product;
-		products[skuQuantity++]=product;
+		int index = -Arrays.binarySearch(products, 0, skuQuantity, product, comparator) - 1;
+		System.arraycopy(products, index, products, index + 1, skuQuantity++ - index);
+		products[index] = product;
+//		products[skuQuantity++]=product;
 
 		return true;
 	}
@@ -61,16 +64,18 @@ public class SupermarketImpl implements Supermarket {
 			}
 		}
 		return null;
+
 	}
 
 	@Override
 	public Product[] findByCategory(String category) {
-//		Product pattern = new Product(Long.MIN_VALUE, null, category, null, Double.MIN_VALUE, null);
-//		int from = -Arrays.binarySearch(products, 0, skuQuantity, pattern, comparator) - 1;
-//		pattern = new Product(Long.MAX_VALUE, null, category, null, Double.MAX_VALUE, null);
-//		int to = -Arrays.binarySearch(products, from, skuQuantity, pattern, comparator) - 1;
-//		return Arrays.copyOfRange(products, from, to);
-		return findProductByPredicate(c -> category.equals(c.getCategory()));
+
+		Product pattern = new Product(Long.MIN_VALUE, null, category, null, Double.MIN_VALUE, null);
+		int from = -Arrays.binarySearch(products, 0, skuQuantity, pattern, comparator) - 1;
+		pattern = new Product(Long.MAX_VALUE, null, category, null, Double.MAX_VALUE, null);
+		int to = -Arrays.binarySearch(products, from, skuQuantity, pattern, comparator) - 1;
+		return Arrays.copyOfRange(products, from, to);
+//		return findProductByPredicate(c -> category.equals(c.getCategory()));
 	}
 
 	@Override
@@ -81,9 +86,15 @@ public class SupermarketImpl implements Supermarket {
 
 	@Override
 	public Product[] findProductsWithExpiredDate() {
-		LocalDate dateNow= LocalDate.now();
+		LocalDate dateNow = LocalDate.now();
+//		Product pattern = new Product(Long.MIN_VALUE, null, null, null, Double.MIN_VALUE, dateNow);
+//		int from = -Arrays.binarySearch(products, 0, skuQuantity, pattern, comparatorByExpiryDate) - 1;
+//		pattern = new Product(Long.MAX_VALUE, null, null, null, Double.MAX_VALUE, LocalDate.isBefore(dateNow));
+//		int to = -Arrays.binarySearch(products, from, skuQuantity, pattern, comparatorByExpiryDate) - 1;
+//		return Arrays.copyOfRange(products, from, to);
+		
 		return findProductByPredicate(c -> c.getExpDate().isBefore(dateNow));
-		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -92,15 +103,6 @@ public class SupermarketImpl implements Supermarket {
 		return skuQuantity;
 	}
 
-//	private int searchByBarCode(long barCode) {
-//		for (int i = 0; i < skuQuantity; i++) {
-//			if (products[i] != null && barCode == products[i].getBarCode()) {
-//				return i;
-//
-//			}
-//		}
-//		return -1;
-//	}
 	private Product[] findProductByPredicate(Predicate<Product> predicate) {
 		int count = 0;
 		for (int i = 0; i < skuQuantity; i++) {
@@ -124,7 +126,6 @@ public class SupermarketImpl implements Supermarket {
 		for (int i = 0; i < skuQuantity; i++) {
 			System.out.println(products[i]);
 		}
-	
-		
+
 	}
 }
